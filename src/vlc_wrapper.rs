@@ -1,0 +1,54 @@
+use std::io::{self};
+use std::process::Command;
+use std::thread;
+use std::process;
+
+extern crate ctrlc;
+
+pub fn play( song: Vec<&str> ) {
+
+    let id = song[0].to_string();
+    let title = song[1].to_string();
+
+    println!("\n Playing: {}", title);
+
+    thread::spawn(move || {
+        Command::new("vlc")
+            .arg("-I dummy")
+            .arg("--dummy-quiet")
+            .arg("--vout=\"none\"")
+            .arg("--one-instance")
+            .arg("--repeat")
+            .arg( format!("https://www.youtube.com/watch?v={}", id))
+            .output()
+            .expect("failed to download/play video");
+    });
+
+
+    let mut _s = String::new();
+    io::stdin().read_line(&mut _s).expect("Did not enter a correct string");
+    {
+        Command::new("vlc")
+            .arg("vlc://quit")
+            .arg("--one-instance")
+            .output()
+            .expect("failed to stop vlc");
+    }
+
+}
+
+pub fn play_handeler_setup() {
+
+    ctrlc::set_handler(move || {
+        
+        Command::new("vlc")
+            .arg("vlc://quit")
+            .arg("--one-instance")
+            .output()
+            .expect("failed to stop vlc");
+
+        process::exit(0);
+
+    }).expect("Error setting Ctrl-C handler");
+
+}
