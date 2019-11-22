@@ -9,12 +9,14 @@ extern crate reqwest;
 use serde::{Deserialize};
 
 mod vlc_wrapper;
-use crate::vlc_wrapper::{play, play_handeler_setup};
+use crate::vlc_wrapper::{play, stop, play_handeler_setup};
 
 extern crate kernel32;
 
 use crossterm::{ExecutableCommand, terminal};
 
+static mut VOLUME: f32 = 100.0;
+static mut SONG_NAME: String = String::new();
 
 fn main() {
 
@@ -51,6 +53,25 @@ fn menu(all: bool) {
 
         menu(!all);
 
+    } else if s.starts_with("v ") {
+        let vol = s.trim_start_matches("v ");
+        let mut vol_int: f32 = 1.0;
+
+        // println!("aaa {}", vol);
+
+        match vol.parse::<f32>() {
+            Ok(n) => vol_int = n,
+            Err(_e) => menu(all)
+        }
+
+        if vol_int <= 200.0 {
+            unsafe {
+                VOLUME = vol_int;
+            }
+        }
+
+        menu(all);
+
     } else if s.starts_with("n ") {
         let id = s.trim_start_matches("n ");
         let title = is_valid_id(&id);
@@ -65,8 +86,10 @@ fn menu(all: bool) {
         save_file(&songs);
 
         display_menu(&songs, false);
-
-        play( song.split("|||").collect() );
+        
+        unsafe {
+            play( song.split("|||").collect(), VOLUME );
+        }
 
         menu(false);
 
@@ -79,6 +102,12 @@ fn menu(all: bool) {
     } else if s == "q" {
 
         return;
+
+    } else if s == "s" {
+
+        stop();
+
+        menu(all);
 
     } else {
         let mut song_int: i32 = 1;
@@ -97,7 +126,12 @@ fn menu(all: bool) {
             update_file( &mut songs, song_int );
             display_menu(&songs, false);
 
-            play( song );
+            unsafe {
+                SONG_NAME = song[1].to_string();
+                // SONG_NAME = "asd";
+
+                play( song, VOLUME );
+            }
 
             menu(false);
 
@@ -109,15 +143,19 @@ fn menu(all: bool) {
 
 fn display_menu(songs: &Vec<&str>, all: bool) {
 
-    print!("\x1B[2J\x1B[H\n");
-    println!("  ╔════════════════════╗");
-    println!("  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║");
-    println!("  ╚════════════════════╝\n");
+    unsafe {
+        print!("\x1B[2J\x1B[H\n");
+        println!("  ╔════════════════════╗ Song: {}", SONG_NAME);
+        println!("  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║  vol: {}", VOLUME);
+        println!("  ╚════════════════════╝\n");
+    }
 
     display_options(songs, all);
 
     println!("\n \x1B[1m[a]\x1B[0m show All ({})", songs.len());
     println!(" \x1B[1m[n]\x1B[0m add New");
+    println!(" \x1B[1m[v]\x1B[0m change Volume");
+    println!(" \x1B[1m[s]\x1B[0m Stop");
     println!(" \x1B[1m[i]\x1B[0m Info");
     println!(" \x1B[1m[q]\x1B[0m Quit");
 
