@@ -2,7 +2,7 @@
 
 
 
-![alt text](https://raw.githubusercontent.com/SimonMTS/CliRr/master/example.gif?token=AD7AJFW5ROCJQPZ3GPC5VLC53SZ3A)
+![alt text](https://raw.githubusercontent.com/SimonMTS/CliRr/v2/example.gif)
 
 # TODO:
 * add volume control
