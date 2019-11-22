@@ -8,15 +8,23 @@ use std::fs::OpenOptions;
 extern crate reqwest;
 use serde::{Deserialize};
 
-mod vlc_wrapper;
-use crate::vlc_wrapper::{play, stop, play_handeler_setup};
-
 extern crate kernel32;
 
 use crossterm::{ExecutableCommand, terminal};
 
-static mut VOLUME: f32 = 100.0;
-static mut SONG_NAME: String = String::new();
+mod vlc_wrapper;
+use crate::vlc_wrapper::{play, stop, play_handeler_setup};
+
+
+#[derive(Clone)]
+struct Status {
+    volume: f32,
+    song: Vec<String>,
+    playing: bool,
+
+    show_all: bool,
+    songs: Vec<String>
+}
 
 fn main() {
 
@@ -24,25 +32,41 @@ fn main() {
     io::stdout().execute(terminal::Clear(terminal::ClearType::All)).expect("Something went getting the handle");
 
     setup_checks();
-    
     play_handeler_setup();
 
-    menu(false);
-
-}
-
-fn menu(all: bool) {
 
     let contents = fs::read_to_string("./store.CliRr")
         .expect("Something went wrong reading the file");
+    let mut lines = contents.lines();
 
-    let mut songs: Vec<&str> = contents.lines().collect();
+    let vol = lines.next().unwrap().to_string();
 
-    display_menu(&songs, all);
+    let vol_int: f32;
+    match vol.parse::<f32>() {
+        Ok(n) => vol_int = n,
+        Err(_e) => vol_int = 100.0
+    }
 
-    print!("\n Choice: ");
+    let status = Status {
+        volume: vol_int,
+        song: "|||".split("|||").map(|s| s.to_string()).collect(),
+        playing: false,
+
+        show_all: false,
+        songs: lines.map(|s| s.to_string()).collect()
+    };
+
+
+    menu(status);
+
+}
+
+fn menu(mut status: Status) {
+    
+    display_menu(&status);
+
+    print!("\n > ");
     let _ = io::stdout().flush();
-
 
     let mut s = String::new();
     io::stdin().read_line(&mut s).expect("Did not enter a correct string");
@@ -51,108 +75,102 @@ fn menu(all: bool) {
 
     if s == "a" {
 
-        menu(!all);
+        status.show_all = !status.show_all;
 
     } else if s.starts_with("v ") {
-        let vol = s.trim_start_matches("v ");
-        let mut vol_int: f32 = 1.0;
 
-        // println!("aaa {}", vol);
+        let vol = s.trim_start_matches("v ");
+        let vol_int: f32;
 
         match vol.parse::<f32>() {
             Ok(n) => vol_int = n,
-            Err(_e) => menu(all)
+            Err(_e) => vol_int = 999.9
         }
 
         if vol_int <= 200.0 {
-            unsafe {
-                VOLUME = vol_int;
-            }
+            status.volume = vol_int;
+
+            play( status.song.clone(), status.volume );
+
+            save_file( &status );
         }
 
-        menu(all);
-
     } else if s.starts_with("n ") {
+
         let id = s.trim_start_matches("n ");
         let title = is_valid_id(&id);
 
-        if title == "" {
-            menu(all);
+        if title != "" {
+
+            let song_str = format!("{}|||{}", id, title);
+
+            status.song = song_str.split("|||").map(|s| s.to_string()).collect();
+            status.songs.insert(0, song_str);
+            status.show_all = false;
+
+            save_file( &status );
+            
+            play( status.song.clone(), status.volume );
+
         }
-
-        let song = format!("{}|||{}", id, title);
-
-        songs.insert(0, &song);
-        save_file(&songs);
-
-        display_menu(&songs, false);
-        
-        unsafe {
-            play( song.split("|||").collect(), VOLUME );
-        }
-
-        menu(false);
 
     }  else if s == "i" {
 
-        display_info();
+        display_info(&status);
 
-        menu(false);
+        status.show_all = false;
 
     } else if s == "q" {
+
+        stop();
 
         return;
 
     } else if s == "s" {
 
+        status.song = "|||".split("|||").map(|s| s.to_string()).collect();
+
         stop();
 
-        menu(all);
-
     } else {
-        let mut song_int: i32 = 1;
+
+        let song_int: i32;
 
         match s.parse::<i32>() {
             Ok(n) => song_int = n -1,
-            Err(_e) => menu(all)
+            Err(_e) => song_int = 999
         }
 
-        if song_int >= songs.len() as i32 {
-            menu(all);
-        } else {
+        if song_int < status.songs.len() as i32 {
 
-            let song: Vec<&str> = songs[song_int as usize].split("|||").collect();
+            status.song = status.songs[song_int as usize].split("|||").map(|s| s.to_string()).collect();
+            status.show_all = false;
             
-            update_file( &mut songs, song_int );
-            display_menu(&songs, false);
+            play( status.song.clone(), status.volume );
 
-            unsafe {
-                SONG_NAME = song[1].to_string();
-                // SONG_NAME = "asd";
+            let selected_song = status.songs.remove(song_int as usize);
+            status.songs.insert(0, selected_song);
 
-                play( song, VOLUME );
-            }
-
-            menu(false);
+            save_file( &status );
 
         }
+
     }
 
+    menu(status);
 }
 
 
-fn display_menu(songs: &Vec<&str>, all: bool) {
+fn display_menu(status: &Status) {
 
-    unsafe {
-        print!("\x1B[2J\x1B[H\n");
-        println!("  ╔════════════════════╗ Song: {}", SONG_NAME);
-        println!("  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║  vol: {}", VOLUME);
-        println!("  ╚════════════════════╝\n");
-    }
+    print!("\x1B[2J\x1B[H\n");
+    println!("  ╔════════════════════╗ Song: {}", status.song[1]);
+    println!("  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║  vol: {}", status.volume);
+    println!("  ╚════════════════════╝\n");
+    
+    display_options(&status);
 
-    display_options(songs, all);
-
-    println!("\n \x1B[1m[a]\x1B[0m show All ({})", songs.len());
+    println!("\n \x1B[1m[a]\x1B[0m show All ({})", status.songs.len());
     println!(" \x1B[1m[n]\x1B[0m add New");
     println!(" \x1B[1m[v]\x1B[0m change Volume");
     println!(" \x1B[1m[s]\x1B[0m Stop");
@@ -161,18 +179,18 @@ fn display_menu(songs: &Vec<&str>, all: bool) {
 
 }
 
-fn display_options(songs: &Vec<&str>, all: bool) {
+fn display_options(status: &Status) {
 
-    let songs_len: i32 = songs.len() as i32;
+    let songs_len: i32 = status.songs.len() as i32;
 
     for i in 0..songs_len {
-        if i >= 5 && !all { break; }
+        if i >= 5 && !status.show_all { break; }
 
-        let song = songs[i as usize].to_string();
+        let song = status.songs[i as usize].to_string();
 
         let split_song: Vec<&str> = song.split("|||").collect();
 
-        if i < 9 && songs_len > 9 && all {
+        if i < 9 && songs_len > 9 && status.show_all {
             print!(" ");
         }
 
@@ -181,11 +199,11 @@ fn display_options(songs: &Vec<&str>, all: bool) {
 
 }
 
-fn display_info() {
+fn display_info(status: &Status) {
 
     print!("\x1B[2J\x1B[H\n");
-    println!("  ╔════════════════════╗");
-    println!("  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║");
+    println!("  ╔════════════════════╗ Song: {}", status.song[1]);
+    println!("  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║  vol: {}", status.volume);
     println!("  ╚════════════════════╝\n");
 
     println!(" [a] show All:\n   Shows the full list of stored songs.\n");
@@ -199,16 +217,7 @@ fn display_info() {
 }
 
 
-fn update_file(songs: &mut Vec<&str>, song_int: i32) {
-
-    let selected_song = songs.remove(song_int as usize);
-    songs.insert(0, selected_song);
-
-    save_file(songs);
-
-}
-
-fn save_file(songs: &Vec<&str>) {
+fn save_file(status: &Status) {
 
     let _file = File::create("store.CliRr");
 
@@ -217,10 +226,14 @@ fn save_file(songs: &Vec<&str>) {
         .open("store.CliRr")
         .unwrap();
 
-    let songs_len: i32 = songs.len() as i32;
+    if let Err(e) = writeln!(file, "{}", status.volume.to_string()) {
+        eprintln!("Couldn't write to file: {}", e);
+    }
+
+    let songs_len: i32 = status.songs.len() as i32;
     for i in 0..songs_len {
 
-        if let Err(e) = writeln!(file, "{}", songs[i as usize].to_string()) {
+        if let Err(e) = writeln!(file, "{}", status.songs[i as usize].to_string()) {
             eprintln!("Couldn't write to file: {}", e);
         }
 
@@ -233,6 +246,15 @@ fn setup_checks() {
 
     if !Path::new("store.CliRr").exists() {
         let _file = File::create("store.CliRr");
+
+        let mut file = OpenOptions::new()
+            .append(true)
+            .open("store.CliRr")
+            .unwrap();
+
+        if let Err(e) = writeln!(file, "{}", "100") {
+            eprintln!("Couldn't write to file: {}", e);
+        }
     }
 
     // vlc path checks

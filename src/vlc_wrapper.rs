@@ -4,7 +4,7 @@ use std::process;
 
 extern crate ctrlc;
 
-pub fn play( song: Vec<&str>, volume: f32 ) {
+pub fn play( song: Vec<String>, volume: f32 ) {
 
     stop();
 
@@ -32,6 +32,9 @@ pub fn stop() {
     
     Command::new("vlc")
         .arg("vlc://quit")
+        .arg("-I dummy")
+        .arg("--dummy-quiet")
+        .arg("--vout=\"none\"")
         .arg("--one-instance")
         .output()
         .expect("failed to stop vlc");
@@ -44,6 +47,9 @@ pub fn play_handeler_setup() {
         
         Command::new("vlc")
             .arg("vlc://quit")
+            .arg("-I dummy")
+            .arg("--dummy-quiet")
+            .arg("--vout=\"none\"")
             .arg("--one-instance")
             .output()
             .expect("failed to stop vlc");
