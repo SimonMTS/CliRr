@@ -1,3 +1,4 @@
 /target
 /releases
 **/*.rs.bk
+**/store.CliRr

@@ -116,10 +116,10 @@ fn display_menu(songs: &Vec<&str>, all: bool) {
 
     display_options(songs, all);
 
-    println!("\n [a] show All ({})", songs.len());
-    println!(" [n] add New");
-    println!(" [i] Info");
-    println!(" [q] Quit");
+    println!("\n \x1B[1m[a]\x1B[0m show All ({})", songs.len());
+    println!(" \x1B[1m[n]\x1B[0m add New");
+    println!(" \x1B[1m[i]\x1B[0m Info");
+    println!(" \x1B[1m[q]\x1B[0m Quit");
 
 }
 
@@ -138,7 +138,7 @@ fn display_options(songs: &Vec<&str>, all: bool) {
             print!(" ");
         }
 
-        println!(" [{}] {}", i+1, split_song[1]);
+        println!(" \x1B[1m[{}]\x1B[0m {}", i+1, split_song[1]);
     }    
 
 }
