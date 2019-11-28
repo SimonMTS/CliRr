@@ -70,7 +70,7 @@ fn mloop(mut status: Status) -> Status {
 
     } else if input == "s" {
 
-        options::stop::exec();
+        status = options::stop::exec(status);
 
     } else {
 
