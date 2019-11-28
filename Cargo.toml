@@ -1,5 +1,5 @@
 [package]
-name = "CliRr"
+name = "clirr"
 version = "0.1.0"
 authors = ["SimonMTS <info@simonstriekwold.nl>"]
 edition = "2018"
