@@ -8,3 +8,5 @@ I like to listen to single songs on repeat while working. Originally I did this 
 
 * VLC must be installed and be accessible from path.
 * Has been tested on Windows 10 & Debian 9.9.
+
+  It seems that CLI VLC is a quite a bit more buggy on linux, though that might just be my install.
