@@ -1,4 +1,4 @@
-use std::process::Command;
+use std::process::{Command, Stdio};
 use std::thread;
 use std::process;
 
@@ -14,11 +14,11 @@ pub fn play( song: Vec<String>, volume: f32 ) {
     thread::spawn(move || {
         Command::new("vlc")
             .arg("-I dummy")
-            .arg("--dummy-quiet")
+            .arg("--quiet")
             .arg("--vout=\"none\"")
             .arg("--one-instance")
             .arg("--repeat")
-            .arg( format!("--mmdevice-volume={}", volume/100.0, ) )
+            .arg( format!("--volume={}", volume/100.0, ) )
             .arg( format!("https://www.youtube.com/watch?v={}", id))
             .output()
             .expect("failed to download/play video");
@@ -31,7 +31,7 @@ pub fn stop() {
     Command::new("vlc")
         .arg("vlc://quit")
         .arg("-I dummy")
-        .arg("--dummy-quiet")
+        .arg("--quiet")
         .arg("--vout=\"none\"")
         .arg("--one-instance")
         .output()
@@ -55,10 +55,11 @@ pub fn path_is_set() -> bool {
     return Command::new("vlc")
         .arg("vlc://quit")
         .arg("-I dummy")
-        .arg("--dummy-quiet")
+        .arg("--quiet")
         .arg("--vout=\"none\"")
         .arg("--one-instance")
-        .spawn()
+        .stdout(Stdio::null())
+        .output()
         .is_ok();
 
 }
