@@ -56,7 +56,7 @@ fn setup_checks() {
 
     
     if !vlc::path_is_set() {
-        println!("\n vlc path is not set.");
+        eprintln!("\n vlc path is not set.");
         process::exit(0);
     }
 
