@@ -50,7 +50,9 @@ fn song_list(status: &Status, lock: &mut StdoutLock) {
 
 fn header(status: &Status, lock: &mut StdoutLock) {
 
+    // write all spaces upto cursor position, then move cursor to 1:1 of viewport
     write!(lock, "\x1B[2J\x1B[H\n").expect("stdout err");
+
     writeln!(lock, "  ╔════════════════════╗ Song: {}", status.song[1]).expect("stdout err");
     writeln!(lock, "  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║  vol: {}", status.volume).expect("stdout err");
     writeln!(lock, "  ╚════════════════════╝\n").expect("stdout err");
@@ -66,6 +68,7 @@ pub fn info(status: &Status) {
     
     writeln!(lock, " [a] show All:\n   Shows the full list of stored songs.\n").expect("stdout err");
     writeln!(lock, " [n] add New: \n   \x1B[1m\"n <video_id>\"\x1B[0m, adds the youtube video_id to the top of the list, and starts playing it.\n").expect("stdout err");
+    writeln!(lock, " [v] change Volume: \n   \x1B[1m\"v <0-200>\"\x1B[0m, restarts the current song with the selected volume.\n").expect("stdout err");
 
     writeln!(lock, " <Press enter to continue>").expect("stdout err");
 }

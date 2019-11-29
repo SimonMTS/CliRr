@@ -10,11 +10,15 @@ pub fn exec(mut status: Status, input: String) -> Status {
 
     match vol.parse::<f32>() {
         Ok(n) => vol_int = n,
-        Err(_e) => vol_int = 999.9
+        Err(_e) => vol_int = -1.0
     }
 
-    if vol_int <= 200.0 {
-        status.volume = vol_int;
+    if vol_int > 0.0 {
+        if vol_int > 200.0 {
+            status.volume = 200.0;
+        } else {
+            status.volume = vol_int;
+        }
 
         vlc::play( status.song.clone(), status.volume );
 
