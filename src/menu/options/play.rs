@@ -15,7 +15,6 @@ pub fn exec(mut status: Status, input: String) -> Status{
     if song_int < status.songs.len() as i32 {
 
         status.song = status.songs[song_int as usize].split("|||").map(|s| s.to_string()).collect();
-        status.show_all = false;
     
         vlc::play( status.song.clone(), status.volume );
 

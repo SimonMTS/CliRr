@@ -5,7 +5,7 @@ use crate::Status;
 
 pub fn exec(mut status: Status, input: String) -> Status {
 
-    let vol = input.trim_start_matches("v ");
+    let vol = input.trim_start_matches("v").trim();
     let vol_int: f32;
 
     match vol.parse::<f32>() {

@@ -21,7 +21,7 @@ pub struct Status {
     song: Vec<String>,
     playing: bool,
 
-    show_all: bool,
+    show_all: i32,
     songs: Vec<String>
 }
 

@@ -16,7 +16,6 @@ pub fn exec(mut status: Status, input: String) -> Status{
 
         status.song = song_str.split("|||").map(|s| s.to_string()).collect();
         status.songs.insert(0, song_str);
-        status.show_all = false;
 
         data_store::save( &status );
         

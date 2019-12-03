@@ -22,10 +22,10 @@ pub fn init() {
 
     let mut status = Status {
         volume: vol_int,
-        song: "|||".split("|||").map(|s| s.to_string()).collect(),
+        song: "|||  ".split("|||").map(|s| s.to_string()).collect(),
         playing: false,
 
-        show_all: false,
+        show_all: -1,
         songs: lines.map(|s| s.to_string()).collect()
     };
 
@@ -48,15 +48,15 @@ fn mloop(mut status: Status) -> Status {
     }
 
 
-    if input == "a" {
+    if input.starts_with("a") {
 
-        status.show_all = !status.show_all;
+        status = options::show_all::exec(status, input);
 
-    } else if input.starts_with("v ") {
+    } else if input.starts_with("v") {
 
         status = options::change_volume::exec(status, input);
 
-    } else if input.starts_with("n ") {
+    } else if input.starts_with("n") {
 
         status = options::add_new::exec(status, input);
 
