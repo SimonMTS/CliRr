@@ -1,33 +1,14 @@
 use std::io;
-use std::fs;
 
 use super::options;
 use crate::view;
 use crate::Status;
+use crate::data_store;
 
 
 pub fn init() {
 
-    let vol_int: f32;
-    let contents = fs::read_to_string("./.CliRr")
-        .expect("Something went wrong reading the file");
-    let mut lines = contents.lines();
-
-    let vol = lines.next().unwrap().to_string();
-
-    match vol.parse::<f32>() {
-        Ok(n) => vol_int = n,
-        Err(_e) => vol_int = 100.0
-    }
-
-    let mut status = Status {
-        volume: vol_int,
-        song: "|||  ".split("|||").map(|s| s.to_string()).collect(),
-        playing: false,
-
-        show_all: -1,
-        songs: lines.map(|s| s.to_string()).collect()
-    };
+    let mut status = data_store::read();
 
     loop {
         status = mloop(status);
