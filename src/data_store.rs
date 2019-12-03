@@ -60,11 +60,15 @@ pub fn read() -> Status {
 
 pub fn make_data_store_valid() {
 
+    if !Path::new(".CliRr").exists() {
+        let _file = File::create(".CliRr");
+    }
+    
+
     let contents = fs::read_to_string(".CliRr").expect("Something went wrong reading the file");
     let line = contents.lines().next();
     
-    if !Path::new(".CliRr").exists() || line == None {
-        let _file = File::create(".CliRr");
+    if line == None {
 
         let mut file = OpenOptions::new()
             .append(true)
@@ -74,6 +78,7 @@ pub fn make_data_store_valid() {
         if let Err(e) = writeln!(file, "{}", "100") {
             eprintln!("Couldn't write to file: {}", e);
         }
+
     }
 
 }
