@@ -2,3 +2,4 @@
 /releases
 **/*.rs.bk
 **/store.CliRr
+**/.CliRr

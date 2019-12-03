@@ -80,11 +80,12 @@ pub fn info(status: &Status) {
 
     header(&status, &mut lock);
     
-    writeln!(lock, "  [a] show All:\n    Allows viewing of the whole song store. (space between 'a' & number is optional)").expect("stdout err");
+    writeln!(lock, "  [a] show All:\n    Allows viewing all songs. (space between 'a' & number is optional)").expect("stdout err");
     writeln!(lock, "    \x1B[30m\x1B[46m\"a -2\"\x1B[0m, really shows all songs.").expect("stdout err");
     writeln!(lock, "    \x1B[30m\x1B[46m\"a -1\"\x1B[0m, show only 5 songs.").expect("stdout err");
     writeln!(lock, "    \x1B[30m\x1B[46m\"a <0..*>\"\x1B[0m, shows 15 songs starting from n.").expect("stdout err");
     writeln!(lock, "    \x1B[30m\x1B[46m\"a\"\x1B[0m, toggle between -1 & 0.\n").expect("stdout err");
+    
     writeln!(lock, "  [n] add New: \n    \x1B[30m\x1B[46m\"n <video_id>\"\x1B[0m, adds the youtube video_id to the top of the list, and starts playing it.\n").expect("stdout err");
     writeln!(lock, "  [v] change Volume: \n    \x1B[30m\x1B[46m\"v <0-200>\"\x1B[0m, restarts the current song with the selected volume. (space between 'v' & number is optional)\n").expect("stdout err");
 

@@ -7,7 +7,7 @@ use crate::Status;
 
 pub fn save(status: &Status) {
 
-    let _file = File::create("store.CliRr");
+    let _file = File::create(".CliRr");
 
     let mut file = OpenOptions::new()
         .append(true)

@@ -41,12 +41,12 @@ fn main() {
 
 fn setup_checks() {
 
-    if !Path::new("store.CliRr").exists() {
-        let _file = File::create("store.CliRr");
+    if !Path::new(".CliRr").exists() {
+        let _file = File::create(".CliRr");
 
         let mut file = OpenOptions::new()
             .append(true)
-            .open("store.CliRr")
+            .open(".CliRr")
             .unwrap();
 
         if let Err(e) = writeln!(file, "{}", "100") {

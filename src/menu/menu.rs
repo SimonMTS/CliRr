@@ -9,7 +9,7 @@ use crate::Status;
 pub fn init() {
 
     let vol_int: f32;
-    let contents = fs::read_to_string("./store.CliRr")
+    let contents = fs::read_to_string("./.CliRr")
         .expect("Something went wrong reading the file");
     let mut lines = contents.lines();
 
