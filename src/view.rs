@@ -57,7 +57,11 @@ fn song_list(status: &Status, lock: &mut StdoutLock) {
             write!(lock, " ").expect("stdout err");
         }
 
-        writeln!(lock, "  \x1B[36m[\x1B[37m{}\x1B[36m]\x1B[0m {}", i+1, split_song[1]).expect("stdout err");
+        if split_song[1].contains("-") {
+            writeln!(lock, "  \x1B[36m[\x1B[37m{}\x1B[36m]\x1B[0m {}\x1B[0m", i+1, split_song[1].replacen("-", "-\x1B[36m", 1).replacen("(", "\x1B[0m(", 1)).expect("stdout err");
+        } else {
+            writeln!(lock, "  \x1B[36m[\x1B[37m{}\x1B[36m]\x1B[0m \x1B[36m{}\x1B[0m", i+1, split_song[1]).expect("stdout err");
+        }
     }    
 
 }
