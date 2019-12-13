@@ -1,33 +1,14 @@
 use std::io;
-use std::fs;
 
 use super::options;
 use crate::view;
 use crate::Status;
+use crate::data_store;
 
 
 pub fn init() {
 
-    let vol_int: f32;
-    let contents = fs::read_to_string("./store.CliRr")
-        .expect("Something went wrong reading the file");
-    let mut lines = contents.lines();
-
-    let vol = lines.next().unwrap().to_string();
-
-    match vol.parse::<f32>() {
-        Ok(n) => vol_int = n,
-        Err(_e) => vol_int = 100.0
-    }
-
-    let mut status = Status {
-        volume: vol_int,
-        song: "|||".split("|||").map(|s| s.to_string()).collect(),
-        playing: false,
-
-        show_all: false,
-        songs: lines.map(|s| s.to_string()).collect()
-    };
+    let mut status = data_store::read();
 
     loop {
         status = mloop(status);
@@ -48,15 +29,15 @@ fn mloop(mut status: Status) -> Status {
     }
 
 
-    if input == "a" {
+    if input.starts_with("a") {
 
-        status.show_all = !status.show_all;
+        status = options::show_all::exec(status, input);
 
-    } else if input.starts_with("v ") {
+    } else if input.starts_with("v") {
 
         status = options::change_volume::exec(status, input);
 
-    } else if input.starts_with("n ") {
+    } else if input.starts_with("n") {
 
         status = options::add_new::exec(status, input);
 

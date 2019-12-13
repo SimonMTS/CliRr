@@ -4,6 +4,8 @@ use std::process;
 
 extern crate ctrlc;
 
+static mut CHILD: Option<process::Child> = None;
+
 
 pub fn play( song: Vec<String>, volume: f32 ) {
 
@@ -11,31 +13,31 @@ pub fn play( song: Vec<String>, volume: f32 ) {
 
     let id = song[0].to_string();
 
-    thread::spawn(move || {
-        Command::new("vlc")
+    unsafe {
+        CHILD = Some(Command::new("vlc")
             .arg("-I dummy")
-            .arg("--quiet")
             .arg("--vout=\"none\"")
-            .arg("--one-instance")
             .arg("--repeat")
             .arg( format!("--volume={}", volume/100.0, ) )
             .arg( format!("https://www.youtube.com/watch?v={}", id))
-            .output()
-            .expect("failed to download/play video");
-    });
+            .spawn()
+            .expect("failed to download/play video"));
+    }
 
 }
 
 pub fn stop() {
     
-    Command::new("vlc")
-        .arg("vlc://quit")
-        .arg("-I dummy")
-        .arg("--quiet")
-        .arg("--vout=\"none\"")
-        .arg("--one-instance")
-        .output()
-        .expect("failed to stop vlc");
+    unsafe {
+        match CHILD {
+            Some(ref mut x) => {
+                x.kill().expect("command wasn't running");
+                CHILD = None;
+            },
+            None    => print!("")
+        }
+    }
+
 
 }
 
@@ -55,11 +57,8 @@ pub fn path_is_set() -> bool {
     return Command::new("vlc")
         .arg("vlc://quit")
         .arg("-I dummy")
-        .arg("--quiet")
         .arg("--vout=\"none\"")
-        .arg("--one-instance")
-        .stdout(Stdio::null())
-        .output()
+        .spawn()
         .is_ok();
 
 }

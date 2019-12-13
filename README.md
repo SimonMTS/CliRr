@@ -7,4 +7,6 @@ A command-line youtube video looper.
 I like to listen to single songs on repeat while working. Originally I did this with "youtuberepeat.com", but that's quite an annoying website. So this is a low-overhead, unobtrusive alternative.
 
 * VLC must be installed and be accessible from path.
-* This has only been tested on windows.
+* Has been tested on Windows 10 & Debian 9.9.
+
+  It seems that CLI VLC is a quite a bit more buggy on linux, though that might just be my install.
