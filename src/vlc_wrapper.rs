@@ -1,5 +1,4 @@
 use std::process::{Command, Stdio};
-use std::thread;
 use std::process;
 
 extern crate ctrlc;
@@ -7,7 +6,7 @@ extern crate ctrlc;
 static mut CHILD: Option<process::Child> = None;
 
 
-pub fn play( song: Vec<String>, volume: f32 ) {
+pub fn play( song: Vec<String>, _volume: f32 ) {
 
     stop();
 
@@ -15,11 +14,13 @@ pub fn play( song: Vec<String>, volume: f32 ) {
 
     unsafe {
         CHILD = Some(Command::new("vlc")
+            .arg("-Vvdummy")
             .arg("-I dummy")
-            .arg("--vout=\"none\"")
             .arg("--repeat")
-            .arg( format!("--volume={}", volume/100.0, ) )
+            // .arg( format!("--waveout-volume={}", volume/100.0, ) )
             .arg( format!("https://www.youtube.com/watch?v={}", id))
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
             .spawn()
             .expect("failed to download/play video"));
     }
@@ -56,8 +57,10 @@ pub fn path_is_set() -> bool {
     
     return Command::new("vlc")
         .arg("vlc://quit")
+        .arg("-Vvdummy")
         .arg("-I dummy")
-        .arg("--vout=\"none\"")
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
         .spawn()
         .is_ok();
 
