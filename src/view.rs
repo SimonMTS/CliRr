@@ -4,6 +4,12 @@ use std::io::StdoutLock;
 
 use crate::Status;
 
+const COLOR_FGL:&str="\x1B[36m";const COLOR_FG:&str="\x1B[96m";const COLOR_BG:&str ="\x1B[46m"; // Cyan
+// const COLOR_FGL:&str="\x1B[35m";const COLOR_FG:&str="\x1B[95m";const COLOR_BG:&str ="\x1B[45m"; // Magenta
+// const COLOR_FGL:&str="\x1B[34m";const COLOR_FG:&str="\x1B[94m";const COLOR_BG:&str ="\x1B[44m"; // Blue
+// const COLOR_FGL:&str="\x1B[33m";const COLOR_FG:&str="\x1B[93m";const COLOR_BG:&str ="\x1B[43m"; // Yellow
+// const COLOR_FGL:&str="\x1B[32m";const COLOR_FG:&str="\x1B[92m";const COLOR_BG:&str ="\x1B[42m"; // Green
+// const COLOR_FGL:&str="\x1B[31m";const COLOR_FG:&str="\x1B[91m";const COLOR_BG:&str ="\x1B[41m"; // Red
 
 pub fn display(status: &Status) {
 
@@ -25,7 +31,7 @@ pub fn display(status: &Status) {
     }
 
 
-    write!(lock, "\n  \x1B[96m>\x1B[36m>\x1B[37m> ").expect("stdout err");
+    write!(lock, "\n  {}>{}>\x1B[37m> ", COLOR_FG, COLOR_FGL).expect("stdout err");
     let _ = io::stdout().flush();
 
 }
@@ -58,13 +64,13 @@ fn song_list(status: &Status, lock: &mut StdoutLock) {
         }
 
         if split_song[1].contains("-") {
-            writeln!(lock, "  \x1B[36m[\x1B[37m{}\x1B[36m]\x1B[0m {}\x1B[0m", i+1, split_song[1]
-                .replacen("-", "-\x1B[96m", 1)
+            writeln!(lock, "  {}[\x1B[37m{}{}]\x1B[0m {}\x1B[0m", COLOR_FGL, i+1, COLOR_FGL, split_song[1]
+                .replacen("[", "\x1B[0m[", 1)
+                .replacen("-", &format!("-{}", COLOR_FG), 1)
                 .replacen("(", "\x1B[0m(", 1))
-                .replacen("[", "\x1B[0m[", 1))
                 .expect("stdout err");
         } else {
-            writeln!(lock, "  \x1B[36m[\x1B[37m{}\x1B[36m]\x1B[0m \x1B[96m{}\x1B[0m", i+1, split_song[1]).expect("stdout err");
+            writeln!(lock, "  {}[\x1B[37m{}{}]\x1B[0m {}{}\x1B[0m", COLOR_FGL, i+1, COLOR_FGL, COLOR_FG, split_song[1]).expect("stdout err");
         }
     }    
 
@@ -75,8 +81,8 @@ fn header(status: &Status, lock: &mut StdoutLock) {
     // write all spaces upto cursor position, then move cursor to 1:1 of viewport
     write!(lock, "\x1B[2J\x1B[H\n").expect("stdout err");
 
-    writeln!(lock, "  ╔════════════════════╗ Song: \x1B[30m\x1B[46m {} \x1B[0m", status.song[1]).expect("stdout err");
-    writeln!(lock, "  ║ Cli \x1B[96mRepeat\x1B[0m in rust ║  vol: \x1B[30m\x1B[46m {} \x1B[0m", status.volume).expect("stdout err");
+    writeln!(lock, "  ╔════════════════════╗ Song: \x1B[30m{} {} \x1B[0m", COLOR_BG, status.song[1]).expect("stdout err");
+    writeln!(lock, "  ║ Cli {}Repeat\x1B[0m in rust ║  vol: \x1B[30m{} {} \x1B[0m", COLOR_FG, COLOR_BG, status.volume).expect("stdout err");
     writeln!(lock, "  ╚════════════════════╝\n").expect("stdout err");
 
 }
