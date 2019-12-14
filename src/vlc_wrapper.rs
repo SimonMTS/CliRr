@@ -6,23 +6,38 @@ extern crate ctrlc;
 static mut CHILD: Option<process::Child> = None;
 
 
-pub fn play( song: Vec<String>, _volume: f32 ) {
+pub fn play( song: Vec<String>, volume: f32 ) {
 
     stop();
 
     let id = song[0].to_string();
 
     unsafe {
-        CHILD = Some(Command::new("vlc")
-            .arg("-Vvdummy")
-            .arg("-I dummy")
-            .arg("--repeat")
-            // .arg( format!("--waveout-volume={}", volume/100.0, ) )
-            .arg( format!("https://www.youtube.com/watch?v={}", id))
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .spawn()
-            .expect("failed to download/play video"));
+        if cfg!(windows) {
+            
+            CHILD = Some(Command::new("vlc")
+                .arg("-I dummy")
+                .arg("--vout=\"none\"")
+                .arg("--repeat")
+                .arg( format!("--mmdevice-volume={}", volume/100.0, ) )
+                .arg( format!("https://www.youtube.com/watch?v={}", id))
+                .spawn()
+                .expect("failed to download/play video"));
+
+        } else if cfg!(unix) {
+            
+            CHILD = Some(Command::new("vlc")
+                .arg("-Vvdummy")
+                .arg("-I dummy")
+                .arg("--repeat")
+                // .arg( format!("--waveout-volume={}", volume/100.0, ) )
+                .arg( format!("https://www.youtube.com/watch?v={}", id))
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .spawn()
+                .expect("failed to download/play video"));
+
+        }
     }
 
 }
