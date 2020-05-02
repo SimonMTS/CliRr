@@ -22,12 +22,12 @@ pub fn display(status: &Status) {
 
     if status.show_all == -1 {
         writeln!(lock, "").expect("stdout err");
-        writeln!(lock, "  \x1B[1m[\x1B[0ma\x1B[1m]\x1B[0m show All ({})", status.songs.len()).expect("stdout err");
-        writeln!(lock, "  \x1B[1m[\x1B[0mn\x1B[1m]\x1B[0m add New").expect("stdout err");
-        writeln!(lock, "  \x1B[1m[\x1B[0mv\x1B[1m]\x1B[0m change Volume").expect("stdout err");
-        writeln!(lock, "  \x1B[1m[\x1B[0ms\x1B[1m]\x1B[0m Stop").expect("stdout err");
-        writeln!(lock, "  \x1B[1m[\x1B[0mi\x1B[1m]\x1B[0m Info").expect("stdout err");
-        writeln!(lock, "  \x1B[1m[\x1B[0mq\x1B[1m]\x1B[0m Quit").expect("stdout err");
+        writeln!(lock, "  \x1B[1m[\x1B[0ma\x1B[1m]\x1B[0m show \x1B[4m\x1B[1mA\x1B[0m\x1B[24mll ({})", status.songs.len()).expect("stdout err");
+        writeln!(lock, "  \x1B[1m[\x1B[0mn\x1B[1m]\x1B[0m add \x1B[4m\x1B[1mN\x1B[0m\x1B[24mew").expect("stdout err");
+        writeln!(lock, "  \x1B[1m[\x1B[0mv\x1B[1m]\x1B[0m change \x1B[4m\x1B[1mV\x1B[0m\x1B[24molume").expect("stdout err");
+        writeln!(lock, "  \x1B[1m[\x1B[0ms\x1B[1m]\x1B[0m \x1B[4m\x1B[1mS\x1B[0m\x1B[24mtop").expect("stdout err");
+        writeln!(lock, "  \x1B[1m[\x1B[0mi\x1B[1m]\x1B[0m \x1B[4m\x1B[1mI\x1B[0m\x1B[24mnfo").expect("stdout err");
+        writeln!(lock, "  \x1B[1m[\x1B[0mq\x1B[1m]\x1B[0m \x1B[4m\x1B[1mQ\x1B[0m\x1B[24muit").expect("stdout err");
     }
 
 
