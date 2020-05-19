@@ -101,7 +101,7 @@ pub fn info(status: &Status) {
     writeln!(lock, "    \x1B[30m\x1B[46m\"a\"\x1B[0m, toggle between -1 & 0.\n").expect("stdout err");
     
     writeln!(lock, "  [n] add New: \n    \x1B[30m\x1B[46m\"n <video_id>\"\x1B[0m, adds the youtube video_id to the top of the list, and starts playing it.\n").expect("stdout err");
-    writeln!(lock, "  [v] change Volume: \n    \x1B[30m\x1B[46m\"v <0-200>\"\x1B[0m, restarts the current song with the selected volume. (space between 'v' & number is optional)\n").expect("stdout err");
+    writeln!(lock, "  [v] change Volume: \n    \x1B[30m\x1B[46m\"v <0-2000>\"\x1B[0m, restarts the current song with the selected volume. (space between 'v' & number is optional)\n").expect("stdout err");
 
     writeln!(lock, " <Press enter to continue>").expect("stdout err");
 }

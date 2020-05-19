@@ -14,8 +14,8 @@ pub fn exec(mut status: Status, input: String) -> Status {
     }
 
     if vol_int > 0.0 {
-        if vol_int > 200.0 {
-            status.volume = 200.0;
+        if vol_int > 2000.0 {
+            status.volume = 2000.0;
         } else {
             status.volume = vol_int;
         }

@@ -1,9 +1,17 @@
 use std::process::{Command, Stdio};
 use std::process;
 
+// use rodio::Source;
+use rodio::Sink;
+use std::fs::File;
+use std::io::BufReader;
+use std::env;
+use std::path::Path;
+
 extern crate ctrlc;
 
 static mut CHILD: Option<process::Child> = None;
+static mut SINK: Option<rodio::Sink> = None;
 
 
 pub fn play( song: Vec<String>, volume: f32 ) {
@@ -14,15 +22,35 @@ pub fn play( song: Vec<String>, volume: f32 ) {
 
     unsafe {
         if cfg!(windows) {
+
+            let filename = get_filename().replace("\\", "/");
+            // println!("{}", filename);
+
+            if !Path::new( &format!("{}{}.mp3", &filename, id) ).exists() {
+                let _vid = Command::new("youtube-dl")
+                    .arg( format!("--output={}{}.%(ext)s", &filename, id) )
+                    .arg("--audio-format=mp3")
+                    .arg("--extract-audio")
+                    .arg("--no-warnings")
+                    .arg("-q")
+                    .arg( format!("{}", id) )
+                    .output()
+                    .expect("failed to download video");
+            }
             
-            CHILD = Some(Command::new("vlc")
-                .arg("-I dummy")
-                .arg("--vout=\"none\"")
-                .arg("--repeat")
-                .arg( format!("--mmdevice-volume={}", volume/100.0, ) )
-                .arg( format!("https://www.youtube.com/watch?v={}", id))
-                .spawn()
-                .expect("failed to download/play video"));
+            let device = rodio::default_output_device().unwrap();
+            let sink = Sink::new(&device);
+
+            let file = File::open( format!("{}{}.mp3", &filename, id) ).unwrap();
+            let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
+
+            // rodio::play_raw(&device, source.convert_samples());
+
+            sink.append(source);
+            sink.set_volume(volume/1000.0);
+            // sink.detach();
+
+            SINK = Some(sink);
 
         } else if cfg!(unix) {
             
@@ -31,7 +59,7 @@ pub fn play( song: Vec<String>, volume: f32 ) {
                 .arg("-I dummy")
                 .arg("--repeat")
                 // .arg( format!("--waveout-volume={}", volume/100.0, ) )
-                .arg( format!("https://www.youtube.com/watch?v={}", id))
+                .arg( format!("https://www.youtube.com/watch?v={}", id) )
                 .stdout(Stdio::null())
                 .stderr(Stdio::null())
                 .spawn()
@@ -50,10 +78,16 @@ pub fn stop() {
                 x.kill().expect("command wasn't running");
                 CHILD = None;
             },
-            None    => print!("")
+            None => print!("")
         }
-    }
 
+        match SINK {
+                Some(ref mut x) => {
+                    x.stop();
+                },
+                None => print!("")
+            }
+    }
 
 }
 
@@ -78,5 +112,23 @@ pub fn path_is_set() -> bool {
         .stderr(Stdio::null())
         .spawn()
         .is_ok();
+
+}
+
+
+fn get_filename() -> String {
+
+    match env::current_exe() {
+        Ok(exe_path) => {
+            return exe_path.display().to_string()
+                .trim_end_matches(".exe")
+                .trim_end_matches("clirr")
+                .trim_end_matches("CliRr").to_string();
+        }
+        Err(e) => {
+            println!("failed to get current exe path: {}", e);
+            return "".to_string();
+        }
+    };
 
 }

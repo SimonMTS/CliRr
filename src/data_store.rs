@@ -80,7 +80,7 @@ pub fn make_data_store_valid() {
             .open(&filename)
             .unwrap();
 
-        if let Err(e) = writeln!(file, "{}", "100") {
+        if let Err(e) = writeln!(file, "{}", "1000") {
             eprintln!("Couldn't write to file: {}", e);
         }
 
