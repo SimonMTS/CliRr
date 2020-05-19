@@ -20,7 +20,9 @@ pub fn exec(mut status: Status, input: String) -> Status {
             status.volume = vol_int;
         }
 
-        vlc::play( status.song.clone(), status.volume );
+        if status.song[0] != "" {
+            vlc::play( status.song.clone(), status.volume );
+        }
 
         data_store::save( &status );
     }

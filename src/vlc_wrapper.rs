@@ -1,4 +1,4 @@
-use std::process::{Command, Stdio};
+use std::process::Command;
 use std::process;
 
 use rodio::Source;
@@ -10,7 +10,7 @@ use std::path::Path;
 
 extern crate ctrlc;
 
-static mut CHILD: Option<process::Child> = None;
+// static mut CHILD: Option<process::Child> = None;
 static mut SINK: Option<rodio::Sink> = None;
 
 
@@ -21,7 +21,7 @@ pub fn play( song: Vec<String>, volume: f32 ) {
     let id = song[0].to_string();
 
     unsafe {
-        if cfg!(windows) {
+        // if cfg!(windows) {
 
             let filename = get_filename().replace("\\", "/");
 
@@ -48,20 +48,20 @@ pub fn play( song: Vec<String>, volume: f32 ) {
             sink.set_volume(volume/1000.0);
             SINK = Some(sink);
 
-        } else if cfg!(unix) {
+        // } else if cfg!(unix) {
             
-            CHILD = Some(Command::new("vlc")
-                .arg("-Vvdummy")
-                .arg("-I dummy")
-                .arg("--repeat")
-                // .arg( format!("--waveout-volume={}", volume/100.0, ) )
-                .arg( format!("https://www.youtube.com/watch?v={}", id) )
-                .stdout(Stdio::null())
-                .stderr(Stdio::null())
-                .spawn()
-                .expect("failed to download/play video"));
+        //     CHILD = Some(Command::new("vlc")
+        //         .arg("-Vvdummy")
+        //         .arg("-I dummy")
+        //         .arg("--repeat")
+        //         // .arg( format!("--waveout-volume={}", volume/100.0, ) )
+        //         .arg( format!("https://www.youtube.com/watch?v={}", id) )
+        //         .stdout(Stdio::null())
+        //         .stderr(Stdio::null())
+        //         .spawn()
+        //         .expect("failed to download/play video"));
 
-        }
+        // }
     }
 
 }
@@ -69,13 +69,13 @@ pub fn play( song: Vec<String>, volume: f32 ) {
 pub fn stop() {
     
     unsafe {
-        match CHILD {
-            Some(ref mut x) => {
-                x.kill().expect("command wasn't running");
-                CHILD = None;
-            },
-            None => print!("")
-        }
+        // match CHILD {
+        //     Some(ref mut x) => {
+        //         x.kill().expect("command wasn't running");
+        //         CHILD = None;
+        //     },
+        //     None => print!("")
+        // }
 
         match SINK {
                 Some(ref mut x) => {
@@ -98,18 +98,18 @@ pub fn play_handeler_setup() {
 
 }
 
-pub fn path_is_set() -> bool {
+// pub fn path_is_set() -> bool {
     
-    return Command::new("vlc")
-        .arg("vlc://quit")
-        .arg("-Vvdummy")
-        .arg("-I dummy")
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .spawn()
-        .is_ok();
+//     return Command::new("vlc")
+//         .arg("vlc://quit")
+//         .arg("-Vvdummy")
+//         .arg("-I dummy")
+//         .stdout(Stdio::null())
+//         .stderr(Stdio::null())
+//         .spawn()
+//         .is_ok();
 
-}
+// }
 
 
 fn get_filename() -> String {

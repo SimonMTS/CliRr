@@ -1,6 +1,6 @@
 use std::io;
 use crossterm::{ExecutableCommand, terminal};
-use std::process;
+// use std::process;
 
 mod data_store;
 mod view;
@@ -40,11 +40,11 @@ fn setup_checks() {
 
     data_store::make_data_store_valid();
     
-    if !vlc::path_is_set() {
-        eprintln!("\n vlc path is not set.");
-        process::exit(0);
-    } else {
-        vlc::stop();
-    }
+    // if !vlc::path_is_set() {
+    //     eprintln!("\n vlc path is not set.");
+    //     process::exit(0);
+    // } else {
+    //     vlc::stop();
+    // }
 
 }
