@@ -1,7 +1,7 @@
 use std::process::{Command, Stdio};
 use std::process;
 
-// use rodio::Source;
+use rodio::Source;
 use rodio::Sink;
 use std::fs::File;
 use std::io::BufReader;
@@ -24,11 +24,10 @@ pub fn play( song: Vec<String>, volume: f32 ) {
         if cfg!(windows) {
 
             let filename = get_filename().replace("\\", "/");
-            // println!("{}", filename);
 
-            if !Path::new( &format!("{}{}.mp3", &filename, id) ).exists() {
+            if !Path::new( &format!("{}data/{}.mp3", &filename, id) ).exists() {
                 let _vid = Command::new("youtube-dl")
-                    .arg( format!("--output={}{}.%(ext)s", &filename, id) )
+                    .arg( format!("--output={}data/{}.%(ext)s", &filename, id) )
                     .arg("--audio-format=mp3")
                     .arg("--extract-audio")
                     .arg("--no-warnings")
@@ -41,15 +40,12 @@ pub fn play( song: Vec<String>, volume: f32 ) {
             let device = rodio::default_output_device().unwrap();
             let sink = Sink::new(&device);
 
-            let file = File::open( format!("{}{}.mp3", &filename, id) ).unwrap();
+            let file = File::open( format!("{}data/{}.mp3", &filename, id) ).unwrap();
             let source = rodio::Decoder::new(BufReader::new(file)).unwrap();
-
-            // rodio::play_raw(&device, source.convert_samples());
-
-            sink.append(source);
+            let rep_source = source.repeat_infinite();
+            
+            sink.append(rep_source);
             sink.set_volume(volume/1000.0);
-            // sink.detach();
-
             SINK = Some(sink);
 
         } else if cfg!(unix) {
